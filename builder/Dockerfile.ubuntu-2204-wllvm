@@ -8,7 +8,8 @@ RUN set -x \
   && apt-get update \
   && apt-get install -y curl libcurl4-openssl-dev libicu-dev libopenblas-base libpcre2-dev wget python3-pip \
   && apt-get build-dep -y r-base \
-  && apt-get install -y clang
+  && apt-get install -y clang \
+  && pip3 install wllvm
 
 RUN curl -LO "https://github.com/goreleaser/nfpm/releases/download/v2.18.1/nfpm_$(dpkg --print-architecture).deb" && \
     apt install -y "./nfpm_$(dpkg --print-architecture).deb" && \
@@ -17,13 +18,20 @@ RUN curl -LO "https://github.com/goreleaser/nfpm/releases/download/v2.18.1/nfpm_
 RUN chmod 0777 /opt
 
 ENV CONFIGURE_OPTIONS="\
-    --enable-R-shlib \
+    --with-blas=no \
+    --with-lapack=no \
+    --enable-R-static-lib \
     --with-tcltk \
     --enable-memory-profiling \
-    --with-x \
-    --with-blas \
-    --with-lapack \
-    CC=clang CXX=clang++"
+    --with-x"
+
+ENV CC=wllvm
+ENV CXX="wllvm++ -stdlib=libc++"
+ENV CPICFLAGS="-fPIC"
+ENV CFLAGS="-Wall -g -O0 -fPIC"
+ENV CXXFLAGS="-Wall -g -O0 -fPIC -I/usr/include/libcxxabi"
+ENV LLVM_COMPILER=clang
+ENV LD="clang++ -stdlib=libc++"
 
 # Override the default pager used by R
 ENV PAGER /usr/bin/pager
@@ -31,6 +39,6 @@ ENV PAGER /usr/bin/pager
 # R 3.x requires PCRE2 for Pango support on Ubuntu 22
 ENV INCLUDE_PCRE2_IN_R_3 yes
 
-COPY builder/package.ubuntu-2204-clang /package.sh
+COPY builder/package.ubuntu-2204-wllvm /package.sh
 COPY build.sh .
 ENTRYPOINT ./build.sh
