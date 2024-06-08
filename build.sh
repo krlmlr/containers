@@ -115,6 +115,8 @@ compile_r() {
   R_PRINTCMD=/usr/bin/lpr \
   R_UNZIPCMD=/usr/bin/unzip \
   R_ZIPCMD=/usr/bin/zip \
+  CFLAGS=-march=x86-64 \
+  CXXFLAGS=-march=x86-64 \
   ./configure \
     --prefix=/opt/R/${1}${2} \
     "${ARGS[@]}" \
