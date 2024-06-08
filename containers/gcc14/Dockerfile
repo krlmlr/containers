@@ -7,7 +7,7 @@ FROM fedora:40
 RUN dnf -y upgrade && \
     dnf -y install dnf-plugins-core && \
     dnf -y install curl && \
-    curl -LO "https://github.com/r-hub/containers/releases/download/latest/R-rstudio-fedora-40-devel-gcc14-1-1.$(arch).rpm" && \
+    curl -LO "https://github.com/krlmlr/containers/releases/download/latest/R-rstudio-fedora-40-devel-gcc14-1-1.$(arch).rpm" && \
     yum install -y R-*.rpm && \
     rm R-*.rpm
 
